@@ -11,7 +11,7 @@
 ;; URL: http://github.com/chrono325/smart-tab/tree/master
 ;; Version: 0.2
 ;; Features that might be required by this library:
-;; 
+;;
 ;;   `easy-mmmode'
 
 
@@ -58,12 +58,23 @@ when we don't have to indent."
           (const :tag "dabbrev-expand" nil))
   :group 'smart-tab)
 
+(defcustom smart-tab-completion-functions-alist
+  '((emacs-lisp-mode . lisp-complete-symbol)
+    (text-mode       . dabbrev-completion))
+  "A-list of major modes in which to use a mode specific completion function.
+If current major mode is not found in this alist, fall back to
+hippie-expand or dabbrev-expand, depending on the value of
+smart-tab-using-hippie-expand"
+  :type '(alist :key-type (symbol :tag "Major mode")
+                :value-type (function :tag "Completion function to use in this mode"))
+  :group 'smart-tab)
+
 ;;;###autoload
 (defun smart-tab (prefix)
   "Try to 'do the right thing' when tab is pressed.
 `smart-tab' attempts to expand the text before the point, indent
 the current line or selection, or complete a string (when in the
-minibuffer). 
+minibuffer).
 
 If tab is pressed while in the minibuffer, then
 `minibuffer-complete' is called, unless an `ido-completing-read'
@@ -88,21 +99,15 @@ the region or the current line (if the mark is not active)."
         (funcall (get-completion-function)))
     (smart-indent)))
 
-(defvar smart-tab-completion-functions
-  '((emacs-lisp-mode lisp-complete-symbol)
-    (lisp-mode slime-complete-symbol)
-    (cperl-mode plcmp-cmd-smart-complete)
-    (text-mode dabbrev-completion))
-  "List of major modes in which to use a mode specific completion
-  function.")
-
 (defun get-completion-function()
   "Get a completion function according to current major mode."
   (let ((completion-function
-         (second (assq major-mode smart-tab-completion-functions))))
+         (cdr (assq major-mode smart-tab-completion-functions-alist))))
     (if (null completion-function)
-        'dabbrev-completion
-        completion-function)))
+        (if smart-tab-using-hippie-expand
+            ('hippie-expand)
+          ('dabbrev-expand))
+      completion-function)))
 
 (defun smart-indent ()
   "Indents region if mark is active, or current line otherwise."
