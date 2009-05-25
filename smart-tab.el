@@ -67,10 +67,25 @@ expands it. Else calls `smart-indent'."
           (ido-complete)
         (minibuffer-complete))
     (if (smart-tab-must-expand prefix)
-        (if smart-tab-using-hippie-expand
-            (hippie-expand nil)
-          (dabbrev-expand nil))
-      (smart-indent))))
+        (funcall (get-completion-function)))
+    (smart-indent)))
+
+(defvar smart-tab-completion-functions
+  '((emacs-lisp-mode lisp-complete-symbol)
+    (lisp-mode slime-complete-symbol)
+    (cperl-mode plcmp-cmd-smart-complete)
+    (text-mode dabbrev-completion))
+  "List of major modes in which to use a mode specific completion
+  function.")
+
+(defun get-completion-function()
+  "Get a completion function according to current major mode."
+  (let ((completion-function
+         (second (assq major-mode smart-tab-completion-functions))))
+    (message "called %s" 'completion-function)
+    (if (null completion-function)
+        'dabbrev-completion
+        completion-function)))
 
 (defun smart-indent ()
   "Indents region if mark is active, or current line otherwise."
