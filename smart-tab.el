@@ -71,16 +71,9 @@ smart-tab-using-hippie-expand"
 
 ;;;###autoload
 (defun smart-tab (prefix)
-  "Try to 'do the right thing' when tab is pressed.
-`smart-tab' attempts to expand the text before the point, indent
-the current line or selection, or complete a string (when in the
-minibuffer).
-
-If tab is pressed while in the minibuffer, then
-`minibuffer-complete' is called, unless an `ido-completing-read'
-is in progress, in which case `ido-complete' is called. This lets
-`smart-tab' work correctly both when completing with ido and when
-using the default completion.
+  "Try to 'do the smart thing' when tab is pressed.
+`smart-tab' attempts to expand the text before the point or
+indent the current line or selection.
 
 In a regular buffer, `smart-tab' will attempt to expand with
 either `hippie-expand' or `dabbrev-expand', depending on the
@@ -88,16 +81,9 @@ value of `smart-tab-using-hippie-expand'. If the mark is active,
 or PREFIX is \\[universal-argument], then `smart-tab' will indent
 the region or the current line (if the mark is not active)."
   (interactive "P")
-  (if (minibufferp)
-      ;; If completing with ido, need to use `ido-complete' to continue
-      ;; completing, not `minibuffer-complete'
-      (if (and (functionp 'ido-active)
-               (ido-active))
-          (ido-complete)
-        (minibuffer-complete))
     (if (smart-tab-must-expand prefix)
         (funcall (get-completion-function)))
-    (smart-indent)))
+    (smart-indent))
 
 (defun get-completion-function()
   "Get a completion function according to current major mode."
@@ -127,8 +113,11 @@ Otherwise, uses `hippie-expand' or `dabbrev-expand' to expand the text at point.
 ;;;###autoload
 (defun smart-tab-mode-on ()
   "Turn on `smart-tab-mode'."
-  (unless (minibufferp)
-    (smart-tab-mode 1)))
+    (smart-tab-mode 1))
+
+;; Save the old definition of tab.
+(defvar smart-tab-previous-tab-binding (global-key-binding "\t"))
+(make-variable-buffer-local 'smart-tab-previous-tab-binding)
 
 ;;;###autoload
 (define-minor-mode smart-tab-mode
@@ -140,9 +129,23 @@ With no argument, this command toggles the mode.
 Non-null prefix argument turns on the mode.
 Null prefix argument turns off the mode."
   :lighter " Smrt"
-  :keymap  '(([tab] . smart-tab))
   :group 'smart-tab
-  :require 'smart-tab)
+  :require 'smart-tab
+  (let ((prev-bind (global-key-binding "\t")))
+    (if smart-tab-mode
+        (progn
+          (unless (eq prev-bind 'smart-tab)
+            (setq smart-tab-previous-tab-binding prev-bind))
+
+          ;; Don't start `smart-tab-mode' when in the minibuffer or a read-only
+          ;; buffer.
+          (when (or (minibufferp)
+                    buffer-read-only)
+            (smart-tab-mode -1))
+          (global-set-key "\t" 'smart-tab))
+
+      ;; Restore the old binding of tab.
+      (global-set-key "\t" smart-tab-previous-tab-binding))))
 
 ;;;###autoload
 (define-globalized-minor-mode global-smart-tab-mode
