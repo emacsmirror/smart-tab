@@ -9,7 +9,7 @@
 ;; Keywords: convenience abbrev
 ;; Created: 24 May 2009
 ;; URL: http://github.com/chrono325/smart-tab/tree/master
-;; Version: 0.2
+;; Version: 0.3
 ;; Features that might be required by this library:
 ;;
 ;;   `easy-mmmode'
@@ -95,13 +95,22 @@ the region or the current line (if the mark is not active)."
           ('dabbrev-expand))
       completion-function)))
 
-(defun smart-indent ()
+(defun smart-tab-default ()
   "Indents region if mark is active, or current line otherwise."
   (interactive)
   (if mark-active
       (indent-region (region-beginning)
                      (region-end))
-    (indent-for-tab-command)))
+
+    (call-interactively
+     (or
+      ;; Minor mode maps for tab (without smart-tab-mode)
+      (cdar (assq-delete-all 'smart-tab-mode (minor-mode-key-binding "\t")))
+      (cdar (assq-delete-all 'smart-tab-mode (minor-mode-key-binding [(tab)])))
+      (local-key-binding "\t")
+      (local-key-binding [(tab)])
+      (global-key-binding "\t")
+      (global-key-binding [(tab)])))))
 
 (defun smart-tab-must-expand (&optional prefix)
   "If PREFIX is \\[universal-argument] or the mark is active, do not expand.
@@ -115,15 +124,9 @@ Otherwise, uses `hippie-expand' or `dabbrev-expand' to expand the text at point.
   "Turn on `smart-tab-mode'."
     (smart-tab-mode 1))
 
-;; Save the old definition of tab.
-(defvar smart-tab-previous-tab-binding (global-key-binding "\t"))
-(make-variable-buffer-local 'smart-tab-previous-tab-binding)
-
 ;;;###autoload
 (define-minor-mode smart-tab-mode
   "Enable `smart-tab' to be used in place of tab.
-
-All this does is set up the keybinding of [tab] to `smart-tab'.
 
 With no argument, this command toggles the mode.
 Non-null prefix argument turns on the mode.
@@ -131,21 +134,15 @@ Null prefix argument turns off the mode."
   :lighter " Smrt"
   :group 'smart-tab
   :require 'smart-tab
-  (let ((prev-bind (global-key-binding "\t")))
-    (if smart-tab-mode
-        (progn
-          (unless (eq prev-bind 'smart-tab)
-            (setq smart-tab-previous-tab-binding prev-bind))
-
-          ;; Don't start `smart-tab-mode' when in the minibuffer or a read-only
-          ;; buffer.
-          (when (or (minibufferp)
-                    buffer-read-only)
-            (smart-tab-mode -1))
-          (global-set-key "\t" 'smart-tab))
-
-      ;; Restore the old binding of tab.
-      (global-set-key "\t" smart-tab-previous-tab-binding))))
+  :keymap '(("\t" . smart-tab)
+            ([(tab)] . smart-tab))
+  (if smart-tab-mode
+      (progn
+        ;; Don't start `smart-tab-mode' when in the minibuffer or a read-only
+        ;; buffer.
+        (when (or (minibufferp)
+                  buffer-read-only)
+          (smart-tab-mode -1)))))
 
 ;;;###autoload
 (define-globalized-minor-mode global-smart-tab-mode
