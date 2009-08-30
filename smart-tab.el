@@ -83,7 +83,7 @@ the region or the current line (if the mark is not active)."
   (interactive "P")
     (if (smart-tab-must-expand prefix)
         (funcall (get-completion-function)))
-    (smart-indent))
+    (smart-tab-default))
 
 (defun get-completion-function()
   "Get a completion function according to current major mode."
