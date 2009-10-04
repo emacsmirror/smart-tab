@@ -82,18 +82,18 @@ or PREFIX is \\[universal-argument], then `smart-tab' will indent
 the region or the current line (if the mark is not active)."
   (interactive "P")
     (if (smart-tab-must-expand prefix)
-        (funcall (get-completion-function)))
-    (smart-tab-default))
+        (call-completion-function))
+      (smart-tab-default))
 
-(defun get-completion-function()
+(defun call-completion-function()
   "Get a completion function according to current major mode."
   (let ((completion-function
          (cdr (assq major-mode smart-tab-completion-functions-alist))))
     (if (null completion-function)
         (if smart-tab-using-hippie-expand
-            ('hippie-expand)
-          ('dabbrev-expand))
-      completion-function)))
+            (hippie-expand nil)
+          (dabbrev-expand nil))
+      (funcall completion-function))))
 
 (defun smart-tab-default ()
   "Indents region if mark is active, or current line otherwise."
@@ -101,16 +101,7 @@ the region or the current line (if the mark is not active)."
   (if mark-active
       (indent-region (region-beginning)
                      (region-end))
-
-    (call-interactively
-     (or
-      ;; Minor mode maps for tab (without smart-tab-mode)
-      (cdar (assq-delete-all 'smart-tab-mode (minor-mode-key-binding "\t")))
-      (cdar (assq-delete-all 'smart-tab-mode (minor-mode-key-binding [(tab)])))
-      (local-key-binding "\t")
-      (local-key-binding [(tab)])
-      (global-key-binding "\t")
-      (global-key-binding [(tab)])))))
+    (indent-for-tab-command)))
 
 (defun smart-tab-must-expand (&optional prefix)
   "If PREFIX is \\[universal-argument] or the mark is active, do not expand.
