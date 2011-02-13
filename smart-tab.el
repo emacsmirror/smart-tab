@@ -89,14 +89,19 @@ smart-tab-using-hippie-expand"
   (let ((completion-function
          (cdr (assq major-mode smart-tab-completion-functions-alist))))
     (if (null completion-function)
-        (if smart-tab-using-hippie-expand
-            (hippie-expand nil)
-          (dabbrev-expand nil))
+        (if (and (not (minibufferp))
+                 (memq 'auto-complete-mode minor-mode-list)
+                 auto-complete-mode)
+            (auto-complete)
+          (if smart-tab-using-hippie-expand
+              (hippie-expand nil)
+            (dabbrev-expand nil)))
       (funcall completion-function))))
 
 (defun smart-tab-must-expand (&optional prefix)
   "If PREFIX is \\[universal-argument] or the mark is active, do not expand.
-Otherwise, uses `hippie-expand' or `dabbrev-expand' to expand the text at point.."
+Otherwise, uses the user's preferred expansion function to expand
+the text at point."
   (unless (or (consp prefix)
               mark-active)
     (looking-at "\\_>")))
@@ -117,13 +122,16 @@ indent the current line or selection.
 
 In a regular buffer, `smart-tab' will attempt to expand with
 either `hippie-expand' or `dabbrev-expand', depending on the
-value of `smart-tab-using-hippie-expand'. If the mark is active,
-or PREFIX is \\[universal-argument], then `smart-tab' will indent
-the region or the current line (if the mark is not active)."
+value of `smart-tab-using-hippie-expand'. Alternatively, if
+`auto-complete-mode' is enabled in the current buffer,
+`auto-complete' will be used to attempt expansion. If the mark is
+active, or PREFIX is \\[universal-argument], then `smart-tab'
+will indent the region or the current line (if the mark is not
+active)."
   (interactive "P")
-    (if (smart-tab-must-expand prefix)
-        (smart-tab-call-completion-function))
-      (smart-tab-default))
+  (if (smart-tab-must-expand prefix)
+      (smart-tab-call-completion-function))
+  (smart-tab-default))
 
 ;;;###autoload
 (defun smart-tab-mode-on ()
