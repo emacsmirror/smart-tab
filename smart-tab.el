@@ -74,13 +74,13 @@ when we don't have to indent."
   "A-list of major modes in which to use a mode specific completion function.
 If current major mode is not found in this alist, fall back to
 `hippie-expand' or `dabbrev-expand', depending on the value of
-smart-tab-using-hippie-expand"
+`smart-tab-using-hippie-expand'"
   :type '(alist :key-type (symbol :tag "Major mode")
                 :value-type (function :tag "Completion function to use in this mode"))
   :group 'smart-tab)
 
 (defcustom smart-tab-disabled-major-modes '(term-mode)
-  "List of major modes that should not use smart-tab."
+  "List of major modes that should not use `smart-tab'."
   :type 'sexp
   :group 'smart-tab)
 
