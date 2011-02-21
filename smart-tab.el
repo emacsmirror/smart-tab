@@ -115,7 +115,7 @@ the text at point."
     (indent-for-tab-command)))
 
 ;;;###autoload
-(defun smart-tab (prefix)
+(defun smart-tab (&optional prefix)
   "Try to 'do the smart thing' when tab is pressed.
 `smart-tab' attempts to expand the text before the point or
 indent the current line or selection.
