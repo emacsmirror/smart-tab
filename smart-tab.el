@@ -103,13 +103,13 @@ If current major mode is not found in this alist, fall back to
 Otherwise, uses the user's preferred expansion function to expand
 the text at point."
   (unless (or (consp prefix)
-              mark-active)
+              (use-region-p))
     (looking-at "\\_>")))
 
 (defun smart-tab-default ()
   "Indent region if mark is active, or current line otherwise."
   (interactive)
-  (if mark-active
+  (if (use-region-p)
       (indent-region (region-beginning)
                      (region-end))
     (indent-for-tab-command)))
