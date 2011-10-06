@@ -137,8 +137,8 @@ will indent the region or the current line (if the mark is not
 active)."
   (interactive "P")
   (if (smart-tab-must-expand prefix)
-      (smart-tab-call-completion-function))
-  (smart-tab-default))
+      (smart-tab-call-completion-function)
+    (smart-tab-default)))
 
 ;;;###autoload
 (defun smart-tab-mode-on ()
