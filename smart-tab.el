@@ -59,6 +59,9 @@
 (defgroup smart-tab nil
   "Options for `smart-tab-mode'.")
 
+(defvar smart-tab-debug nil
+  "Turn on for logging about which smart-tab function ends up being called.")
+
 (defcustom smart-tab-using-hippie-expand nil
   "Use `hippie-expand' to expand text.
 Use either `hippie-expand' or `dabbrev-expand' for expanding text
@@ -86,6 +89,8 @@ If current major mode is not found in this alist, fall back to
 
 (defun smart-tab-call-completion-function ()
   "Get a completion function according to current major mode."
+  (if smart-tab-debug
+      (message "complete"))
   (let ((completion-function
          (cdr (assq major-mode smart-tab-completion-functions-alist))))
     (if (null completion-function)
@@ -109,6 +114,8 @@ the text at point."
 (defun smart-tab-default ()
   "Indent region if mark is active, or current line otherwise."
   (interactive)
+  (if smart-tab-debug
+      (message "default"))
   (if (use-region-p)
       (indent-region (region-beginning)
                      (region-end))
