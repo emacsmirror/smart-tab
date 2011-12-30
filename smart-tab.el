@@ -185,6 +185,8 @@ Null prefix argument turns off the mode."
           (smart-tab-mode-off)))))
 
 ;;;###autoload
+; Elint fix: Call to undefined function: global-smart-tab-mode-enable-in-buffers
+(autoload 'global-smart-tab-mode-enable-in-buffers "smart-tab")
 (define-globalized-minor-mode global-smart-tab-mode
   smart-tab-mode
   smart-tab-mode-on
