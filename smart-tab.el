@@ -184,6 +184,7 @@ Null prefix argument turns off the mode."
                   (member major-mode smart-tab-disabled-major-modes))
           (smart-tab-mode-off)))))
 
+;;;###autoload
 (define-globalized-minor-mode global-smart-tab-mode
   smart-tab-mode
   smart-tab-mode-on
