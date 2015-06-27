@@ -143,10 +143,10 @@ indent the current line or selection.
 
 In a regular buffer, `smart-tab' will attempt to expand with
 either `hippie-expand' or `dabbrev-expand', depending on the
-value of `smart-tab-using-hippie-expand'. Alternatively, if
+value of `smart-tab-using-hippie-expand'.  Alternatively, if
 `auto-complete-mode' is enabled in the current buffer,
-`auto-complete' will be used to attempt expansion. If the mark is
-active, or PREFIX is \\[universal-argument], then `smart-tab'
+`auto-complete' will be used to attempt expansion.  If the mark
+is active, or PREFIX is \\[universal-argument], then `smart-tab'
 will indent the region or the current line (if the mark is not
 active)."
   (interactive "P")
