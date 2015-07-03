@@ -165,8 +165,7 @@ active)."
     (indent-region (region-beginning)
                    (region-end)))
    ((smart-tab-must-expand prefix)
-    (or (smart-tab-call-completion-function)
-        (smart-tab-default)))
+    (smart-tab-call-completion-function))
    (t
     (smart-tab-default))))
 
