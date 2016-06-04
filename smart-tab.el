@@ -56,10 +56,6 @@
 
 (require 'easy-mmode)
 
-(eval-when-compile
-  ;; Forward declaration, does not define variable
-  (defvar auto-complete-mode))
-
 (defgroup smart-tab nil
   "Options for `smart-tab-mode'."
   :group 'tools)
@@ -92,6 +88,18 @@ If current major mode is not found in this alist, fall back to
   :type 'sexp
   :group 'smart-tab)
 
+(defcustom smart-tab-user-provided-completion-function nil
+  "Use a completion function provided by a completion framework
+like `company-mode' or `auto-complete-mode' to attempt
+expansion.
+
+For eg: If you use `company-mode' for completion, you can set
+`smart-tab-user-provided-completion-function' as
+`company-complete'.  For `auto-complete-mode', it should be
+`ac-start'."
+  :type '(function)
+  :group 'smart-tab)
+
 (put 'smart-tab-funcall 'lisp-indent-function 0)
 (put 'smart-tab-funcall 'edebug-form-spec '(body))
 (defmacro smart-tab-funcall (function &rest args)
@@ -108,10 +116,8 @@ If current major mode is not found in this alist, fall back to
          (cdr (assq major-mode smart-tab-completion-functions-alist))))
     (if (null completion-function)
         (if (and (not (minibufferp))
-                 (memq 'auto-complete-mode minor-mode-list)
-                 (boundp' auto-complete-mode)
-                 auto-complete-mode)
-            (smart-tab-funcall 'ac-start :force-init t)
+                 (fboundp smart-tab-user-provided-completion-function))
+            (smart-tab-funcall smart-tab-user-provided-completion-function)
           (if smart-tab-using-hippie-expand
               (hippie-expand nil)
             (dabbrev-expand nil)))
@@ -151,12 +157,11 @@ indent the current line or selection.
 
 In a regular buffer, `smart-tab' will attempt to expand with
 either `hippie-expand' or `dabbrev-expand', depending on the
-value of `smart-tab-using-hippie-expand'.  Alternatively, if
-`auto-complete-mode' is enabled in the current buffer,
-`auto-complete' will be used to attempt expansion.  If the mark
-is active, or PREFIX is \\[universal-argument], then `smart-tab'
-will indent the region or the current line (if the mark is not
-active)."
+value of `smart-tab-using-hippie-expand'.  Alternatively, if a
+`smart-tab-user-provided-completion-function' is defined, it will
+be used to attempt expansion.  If the mark is active, or PREFIX is
+\\[universal-argument], then `smart-tab' will indent the region
+or the current line (if the mark is not active)."
   (interactive "P")
   (cond
    (buffer-read-only
