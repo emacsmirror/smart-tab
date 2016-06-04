@@ -100,6 +100,14 @@ For eg: If you use `company-mode' for completion, you can set
   :type '(function)
   :group 'smart-tab)
 
+(defcustom smart-tab-expand-eolp nil
+  "This variable decides if `smart-tab' should offer completion
+when the point is at the end of the current line.  The default
+behaviour is to do nothing.  Set this to t to enable (for example)
+method completions."
+  :type '(boolean)
+  :group 'smart-tab)
+
 (put 'smart-tab-funcall 'lisp-indent-function 0)
 (put 'smart-tab-funcall 'edebug-form-spec '(body))
 (defmacro smart-tab-funcall (function &rest args)
@@ -170,6 +178,8 @@ or the current line (if the mark is not active)."
     (indent-region (region-beginning)
                    (region-end)))
    ((smart-tab-must-expand prefix)
+    (smart-tab-call-completion-function))
+   ((and smart-tab-expand-eolp (eolp))
     (smart-tab-call-completion-function))
    (t
     (smart-tab-default))))
