@@ -12,7 +12,7 @@
 ;; Keywords: extensions
 ;; Created: 2009-05-24
 ;; URL: http://github.com/genehack/smart-tab/tree/master
-;; Version: 0.3
+;; Version: 0.4
 ;;
 ;; This program is free software; you can redistribute it and/or modify it under
 ;; the terms of the GNU General Public License as published by the Free Software
