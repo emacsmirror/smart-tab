@@ -39,12 +39,12 @@
 ;;
 ;; DESCRIPTION
 ;;
-;; Try to 'do the smart thing' when tab is pressed. `smart-tab'
+;; Try to 'do the smart thing' when tab is pressed.  `smart-tab'
 ;; attempts to expand the text before the point or indent the current
 ;; line or selection.
 ;;
-;; See <http://www.emacswiki.org/cgi-bin/wiki/TabCompletion#toc2>. There are a
-;; number of available customizations on that page.
+;; See <http://www.emacswiki.org/cgi-bin/wiki/TabCompletion#toc2>.
+;; There are a number of available customizations on that page.
 ;;
 ;; Features that might be required by this library:
 ;;
@@ -89,7 +89,7 @@ If current major mode is not found in this alist, fall back to
   :group 'smart-tab)
 
 (defcustom smart-tab-user-provided-completion-function nil
-  "Use a completion function provided by a completion framework to attempt expansion.
+  "Use a function provided by a completion framework to attempt expansion.
 
 By default, we check for the presence of `auto-complete-mode' and
 use it as the completion framework.  Set this variable if you want to use a
