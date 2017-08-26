@@ -139,10 +139,9 @@ Use one of these default methods to attempt completion."
      (t (dabbrev-expand nil)))))
 
 (defcustom smart-tab-expand-eolp nil
-  "This variable decides if `smart-tab' should offer completion
-when the point is at the end of the current line.  The default
-behaviour is to do nothing.  Set this to t to enable (for example)
-method completions."
+  "Controls whether `smart-tab' should offer completion when point is at EOL.
+The default behaviour is to do nothing.  Set this to t to
+enable (for example) method completions."
   :type '(boolean)
   :group 'smart-tab)
 
