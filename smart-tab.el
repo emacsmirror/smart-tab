@@ -12,7 +12,7 @@
 ;; Keywords: extensions
 ;; Created: 2009-05-24
 ;; URL: http://github.com/genehack/smart-tab/tree/master
-;; Version: 0.3
+;; Version: 0.4
 ;;
 ;; This program is free software; you can redistribute it and/or modify it under
 ;; the terms of the GNU General Public License as published by the Free Software
@@ -39,12 +39,12 @@
 ;;
 ;; DESCRIPTION
 ;;
-;; Try to 'do the smart thing' when tab is pressed. `smart-tab'
+;; Try to 'do the smart thing' when tab is pressed.  `smart-tab'
 ;; attempts to expand the text before the point or indent the current
 ;; line or selection.
 ;;
-;; See <http://www.emacswiki.org/cgi-bin/wiki/TabCompletion#toc2>. There are a
-;; number of available customizations on that page.
+;; See <http://www.emacswiki.org/cgi-bin/wiki/TabCompletion#toc2>.
+;; There are a number of available customizations on that page.
 ;;
 ;; Features that might be required by this library:
 ;;
@@ -55,10 +55,6 @@
 ;;; Code:
 
 (require 'easy-mmode)
-
-(eval-when-compile
-  ;; Forward declaration, does not define variable
-  (defvar auto-complete-mode))
 
 (defgroup smart-tab nil
   "Options for `smart-tab-mode'."
@@ -92,30 +88,62 @@ If current major mode is not found in this alist, fall back to
   :type 'sexp
   :group 'smart-tab)
 
-(put 'smart-tab-funcall 'lisp-indent-function 0)
-(put 'smart-tab-funcall 'edebug-form-spec '(body))
-(defmacro smart-tab-funcall (function &rest args)
-  "If FUNCTION is `fboundp' call it with ARGS."
-  `(let ((function ,function))
-     (if (fboundp function)
-         (apply function ,@args nil))))
+(defcustom smart-tab-user-provided-completion-function nil
+  "Use a function provided by a completion framework to attempt expansion.
+
+By default, we check for the presence of `auto-complete-mode' and
+use it as the completion framework.  Set this variable if you want to use a
+different completion framework.
+
+Eg: For `company-mode', you can set this var to `company-complete'."
+  :type '(function)
+  :group 'smart-tab)
 
 (defun smart-tab-call-completion-function ()
-  "Get a completion function according to current major mode."
+  "Completion is attempted as follows:
+
+1. Check if a mode-specific completion function is defined in
+`smart-tab-completion-functions-alist'.  If yes, then use it.
+
+2. Check if the user has plugged in a custom completion function
+in `smart-tab-user-provided-completion-function'.  If yes, then
+use it.
+
+3. Check if `auto-complete-mode' is installed.  If yes, then use
+it.
+
+4. Check if user prefers `hippie-expand' instead of
+`dabbrev-expand' by referring to `smart-tab-using-hippie-expand'.
+Use one of these default methods to attempt completion."
   (if smart-tab-debug
       (message "complete"))
-  (let ((completion-function
+  (let ((smart-tab-mode-specific-completion-function
          (cdr (assq major-mode smart-tab-completion-functions-alist))))
-    (if (null completion-function)
-        (if (and (not (minibufferp))
-                 (memq 'auto-complete-mode minor-mode-list)
-                 (boundp' auto-complete-mode)
-                 auto-complete-mode)
-            (smart-tab-funcall 'ac-start :force-init t)
-          (if smart-tab-using-hippie-expand
-              (hippie-expand nil)
-            (dabbrev-expand nil)))
-      (funcall completion-function))))
+    (cond
+     ((fboundp smart-tab-mode-specific-completion-function)
+      (funcall smart-tab-mode-specific-completion-function))
+
+     ((and (not (minibufferp))
+           (fboundp smart-tab-user-provided-completion-function))
+      (funcall smart-tab-user-provided-completion-function))
+
+     ((and (not (minibufferp))
+           (memq 'auto-complete-mode minor-mode-list)
+           (boundp 'auto-complete-mode)
+           (fboundp 'ac-start))
+      (ac-start :force-init t nil))
+
+     (smart-tab-using-hippie-expand
+      (hippie-expand nil))
+
+     (t (dabbrev-expand nil)))))
+
+(defcustom smart-tab-expand-eolp nil
+  "Controls whether `smart-tab' should offer completion when point is at EOL.
+The default behaviour is to do nothing.  Set this to t to
+enable (for example) method completions."
+  :type '(boolean)
+  :group 'smart-tab)
 
 (defun smart-tab-must-expand (&optional prefix)
   "If PREFIX is \\[universal-argument] or the mark is active, do not expand.
@@ -151,12 +179,11 @@ indent the current line or selection.
 
 In a regular buffer, `smart-tab' will attempt to expand with
 either `hippie-expand' or `dabbrev-expand', depending on the
-value of `smart-tab-using-hippie-expand'.  Alternatively, if
-`auto-complete-mode' is enabled in the current buffer,
-`auto-complete' will be used to attempt expansion.  If the mark
-is active, or PREFIX is \\[universal-argument], then `smart-tab'
-will indent the region or the current line (if the mark is not
-active)."
+value of `smart-tab-using-hippie-expand'.  Alternatively, if a
+`smart-tab-user-provided-completion-function' is defined, it will
+be used to attempt expansion.  If the mark is active, or PREFIX is
+\\[universal-argument], then `smart-tab' will indent the region
+or the current line (if the mark is not active)."
   (interactive "P")
   (cond
    (buffer-read-only
@@ -165,6 +192,8 @@ active)."
     (indent-region (region-beginning)
                    (region-end)))
    ((smart-tab-must-expand prefix)
+    (smart-tab-call-completion-function))
+   ((and smart-tab-expand-eolp (eolp))
     (smart-tab-call-completion-function))
    (t
     (smart-tab-default))))
