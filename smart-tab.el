@@ -130,7 +130,7 @@ Use one of these default methods to attempt completion."
      ((and (not (minibufferp))
            (memq 'auto-complete-mode minor-mode-list)
            (boundp 'auto-complete-mode)
-	   auto-complete-mode
+           auto-complete-mode
            (fboundp 'ac-start))
       (ac-start :force-init t nil))
 
