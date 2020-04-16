@@ -96,7 +96,7 @@ By default, we check for the presence of `auto-complete-mode' and
 use it as the completion framework.  Set this variable if you want to use a
 different completion framework.
 
-Eg: For `company-mode', you can set this var to `company-complete'."
+Eg: For function `company-mode', you can set this var to `company-complete'."
   :type '(function)
   :group 'smart-tab)
 
