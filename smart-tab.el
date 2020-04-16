@@ -5,10 +5,10 @@
 ;; Copyright (C) 2009-2020 John SJ Anderson,
 ;;                         Sebastien Rocca Serra,
 ;;                         Daniel Hackney
-;; Author: John SJ Anderson <genehack@genehack.org>,
+;; Author: John SJ Anderson <john@genehack.org>,
 ;;         Sebastien Rocca Serra <sroccaserra@gmail.com>,
 ;;         Daniel Hackney <dan@haxney.org>
-;; Maintainer: John SJ Anderson <genehack@genehack.org>
+;; Maintainer: John SJ Anderson <john@genehack.org>
 ;; Keywords: extensions
 ;; Created: 2009-05-24
 ;; URL: http://github.com/genehack/smart-tab/tree/master
