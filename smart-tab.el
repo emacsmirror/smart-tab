@@ -2,7 +2,7 @@
 
 ;; This file is NOT part of GNU Emacs.
 
-;; Copyright (C) 2009-2019 John SJ Anderson,
+;; Copyright (C) 2009-2020 John SJ Anderson,
 ;;                         Sebastien Rocca Serra,
 ;;                         Daniel Hackney
 ;; Author: John SJ Anderson <genehack@genehack.org>,
