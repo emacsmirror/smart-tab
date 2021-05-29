@@ -2,7 +2,7 @@
 
 ;; This file is NOT part of GNU Emacs.
 
-;; Copyright (C) 2009-2020 John SJ Anderson,
+;; Copyright (C) 2009-2021 John SJ Anderson,
 ;;                         Sebastien Rocca Serra,
 ;;                         Daniel Hackney
 ;; Author: John SJ Anderson <john@genehack.org>,
@@ -12,7 +12,7 @@
 ;; Keywords: extensions
 ;; Created: 2009-05-24
 ;; URL: http://github.com/genehack/smart-tab/tree/master
-;; Version: 0.6
+;; Version: 0.7
 ;; Package-Requires: ((emacs "24.3"))
 ;;
 ;; This program is free software; you can redistribute it and/or modify it under
