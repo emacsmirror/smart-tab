@@ -49,12 +49,14 @@
 ;;
 ;; Features that might be required by this library:
 ;;
+;;   `cl-macs'
 ;;   `easy-mmmode'
 
 ;;; Change Log:
 
 ;;; Code:
 
+(require 'cl-macs)
 (require 'easy-mmode)
 
 (defgroup smart-tab nil
