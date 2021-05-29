@@ -52,8 +52,6 @@
 ;;   `cl-macs'
 ;;   `easy-mmmode'
 
-;;; Change Log:
-
 ;;; Code:
 
 (require 'cl-macs)
