@@ -11,7 +11,7 @@
 ;; Maintainer: John SJ Anderson <john@genehack.org>
 ;; Keywords: extensions
 ;; Created: 2009-05-24
-;; URL: http://github.com/genehack/smart-tab/tree/master
+;; URL: https://git.genehack.net/genehack/smart-tab
 ;; Version: 0.7
 ;; Package-Requires: ((emacs "24.3"))
 ;;
